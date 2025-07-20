@@ -1,9 +1,9 @@
 from fastapi import HTTPException, status
 
 from repos.v1.examples import (
-    CreateExample, 
-    UpdateExample, 
-    ExampleInDb, 
+    CreateExample,
+    UpdateExample,
+    ExampleInDb,
     ExamplesRepository,
     ExamplesDataSource,
 )
@@ -29,8 +29,12 @@ class ExamplesController:
             )
         return example
 
-    async def update_example_by_id(self, example_id: str, body: UpdateExample) -> ExampleInDb:
-        updated_example = await self.examples_repo.update_example_by_id(example_id, body)
+    async def update_example_by_id(
+        self, example_id: str, body: UpdateExample
+    ) -> ExampleInDb:
+        updated_example = await self.examples_repo.update_example_by_id(
+            example_id, body
+        )
         if updated_example is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -46,6 +50,7 @@ class ExamplesController:
                 detail="Example not found",
             )
         return deleted_example
+
 
 examples_controller = ExamplesController(
     examples_repo=ExamplesRepository(
