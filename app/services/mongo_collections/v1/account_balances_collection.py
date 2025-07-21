@@ -16,24 +16,18 @@ class AccountBalancesCollection:
         mongo_service = MongoService()
         self.__collection = mongo_service.get_collection(self.collection_name)
 
-    async def create_account_balance(self, account_balance: dict) -> None:
-        collection = self.__collection
-        await collection.insert_one(account_balance)
-
-    async def fetch_all_account_balances(self) -> list[dict[str, Any]]:
-        collection = self.__collection
-        cursor = collection.find()
-
-        result = await cursor.to_list(length=None)
-        await cursor.close()
-
-        return result
-
-    async def fetch_account_balance_by_id(
-        self, account_balance_id: str
+    async def fetch_account_balance(
+        self,
+        account_id: str,
+        branch_id: str,
     ) -> dict[str, Any] | None:
         collection = self.__collection
-        result = await collection.find_one({"id": account_balance_id})
+        result = await collection.find_one(
+            {
+                "accountId": account_id,
+                "branchId": branch_id,
+            }
+        )
         return result
 
     async def update_account_balance_by_id(
@@ -85,6 +79,36 @@ class AccountBalancesCollection:
             },
             session=session,
             upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
+
+        return result
+
+    async def subtract_account_balance_with_session(
+        self,
+        account_id: str,
+        branch_id: str,
+        quantity: int,
+        updated_at: int,
+        session: Any,
+    ) -> dict[str, Any] | None:
+        collection = self.__collection
+
+        result = await collection.find_one_and_update(
+            {
+                "accountId": account_id,
+                "branchId": branch_id,
+                "balance": {"$gte": abs(quantity)},
+            },
+            {
+                "$inc": {
+                    "balance": quantity,
+                },
+                "$set": {
+                    "updatedAt": updated_at,
+                },
+            },
+            session=session,
             return_document=ReturnDocument.AFTER,
         )
 

@@ -13,7 +13,7 @@ if current_mode == "PROD":
     open_api_url = None
 
 app = FastAPI(
-    title="Server App",
+    title="Ledger Server",
     default_response_class=ORJSONResponse,
     openapi_url=open_api_url,
     lifespan=lifespan,
