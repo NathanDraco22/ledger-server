@@ -19,5 +19,5 @@ class UpdateUnit(BaseModel):
 
 class UnitInDb(BaseUnit):
     id: str
-    created_at: int
-    updated_at: int | None = None
+    createdAt: int
+    updatedAt: int | None = None

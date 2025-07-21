@@ -11,7 +11,7 @@ class AccountsRepository:
     async def create_account(self, create_account: CreateAccount) -> AccountInDb:
         new_account = AccountInDb(
             id=UuidTool.generate_uuid(),
-            created_at=TimeTools.get_now_in_milliseconds(),
+            createdAt=TimeTools.get_now_in_milliseconds(),
             **create_account.model_dump(),
         )
 
@@ -37,7 +37,7 @@ class AccountsRepository:
     ) -> AccountInDb | None:
         update_account_data = account.model_dump(exclude_unset=True)
 
-        update_account_data["updated_at"] = TimeTools.get_now_in_milliseconds()
+        update_account_data["updatedAt"] = TimeTools.get_now_in_milliseconds()
 
         result = await self.accounts_ds.update_account_by_id(
             account_id, update_account_data
