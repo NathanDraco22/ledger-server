@@ -53,3 +53,12 @@ class AccountsCollection:
         collection = self.__collection
         result = await collection.find_one_and_delete({"id": account_id})
         return result
+
+    async def count_accounts(self, account_ids: list[str]) -> int:
+        collection = self.__collection
+        result = await collection.count_documents(
+            {
+                "id": {"$in": account_ids},
+            },
+        )
+        return result

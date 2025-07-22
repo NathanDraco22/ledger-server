@@ -55,3 +55,6 @@ class AccountsRepository:
             return None
 
         return AccountInDb.model_validate(result)
+
+    async def count_accounts(self, account_ids: list[str]) -> int:
+        return await self.accounts_ds.count_accounts(account_ids)

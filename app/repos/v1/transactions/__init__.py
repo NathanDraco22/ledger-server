@@ -4,6 +4,8 @@ from .models.transaction_model import (
     TransactionInDb,
     CreateEntryTransaction,
     CreateExitTransaction,
+    BatchEntryTransaction,
+    BatchExitTransaction,
 )
 from .transactions_repository import TransactionsRepository
 
@@ -14,4 +16,6 @@ __all__ = [
     "CreateExitTransaction",
     "TransactionInDb",
     "TransactionsRepository",
+    "BatchEntryTransaction",
+    "BatchExitTransaction",
 ]

@@ -27,6 +27,28 @@ class TransactionInDb(BaseTransaction):
     createdAt: int
 
 
+class BatchEntryItem(BaseModel):
+    accountId: str
+    quantity: int = Field(..., gt=0)
+
+
+class BatchEntryTransaction(BaseModel):
+    branchId: str
+    type: Literal["ENTRY"] = "ENTRY"
+    items: list[BatchEntryItem]
+
+
+class BatchExitItem(BaseModel):
+    accountId: str
+    quantity: int = Field(..., lt=0)
+
+
+class BatchExitTransaction(BaseModel):
+    branchId: str
+    type: Literal["ENTRY"] = "ENTRY"
+    items: list[BatchEntryItem]
+
+
 CreateTransaction = Annotated[
     Union[CreateExitTransaction, CreateEntryTransaction],
     Field(discriminator="type"),

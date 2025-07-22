@@ -46,3 +46,14 @@ class TransactionsCollection:
             transaction_data,
             session=session,
         )
+
+    async def create_many_transactions_with_session(
+        self,
+        transactions_data: list[dict],
+        session: Any,
+    ) -> None:
+        collection = self.__collection
+        await collection.insert_many(
+            transactions_data,
+            session=session,
+        )

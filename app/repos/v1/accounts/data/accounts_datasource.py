@@ -31,3 +31,7 @@ class AccountsDataSource:
     async def delete_account_by_id(self, account_id: str) -> dict[str, Any] | None:
         collection = AccountsCollection()
         return await collection.delete_account_by_id(account_id)
+
+    async def count_accounts(self, account_ids: list[str]) -> int:
+        collection = AccountsCollection()
+        return await collection.count_accounts(account_ids)

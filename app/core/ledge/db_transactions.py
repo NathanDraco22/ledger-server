@@ -1,4 +1,9 @@
-from repos.v1.transactions import CreateEntryTransaction, CreateExitTransaction
+from repos.v1.transactions import (
+    CreateEntryTransaction,
+    CreateExitTransaction,
+    BatchEntryTransaction,
+    BatchExitTransaction,
+)
 
 from repos.v1.account_balances import AccountBalanceInDb
 
@@ -68,3 +73,98 @@ async def process_account_exit_transaction(
             )
 
             return AccountBalanceInDb.model_validate(result)
+
+
+async def process_batch_account_entry_transaction(
+    batch_entry_transaction: BatchEntryTransaction,
+) -> list[AccountBalanceInDb]:
+    client = MongoService().client
+
+    transaction_col = TransactionsCollection()
+    account_balance_col = AccountBalancesCollection()
+
+    async with await client.start_session() as session:
+        async with session.start_transaction():
+            updated_balances: list[AccountBalanceInDb] = []
+
+            create_entry_transacions: list[CreateEntryTransaction] = []
+
+            for entry_item in batch_entry_transaction.items:
+                result = await account_balance_col.update_account_balance_with_session(
+                    entry_item.accountId,
+                    batch_entry_transaction.branchId,
+                    entry_item.quantity,
+                    updated_at=TimeTools.get_now_in_milliseconds(),
+                    session=session,
+                )
+
+                updated_balance = AccountBalanceInDb.model_validate(result)
+
+                updated_balances.append(updated_balance)
+
+                new_entry_transaction = CreateEntryTransaction(
+                    accountId=entry_item.accountId,
+                    branchId=batch_entry_transaction.branchId,
+                    quantity=entry_item.quantity,
+                )
+
+                create_entry_transacions.append(new_entry_transaction)
+
+            entry_data = [entry.model_dump() for entry in create_entry_transacions]
+
+            await transaction_col.create_many_transactions_with_session(
+                entry_data,
+                session,
+            )
+
+            return updated_balances
+
+
+async def process_batch_account_exit_transaction(
+    batch_exit_transaction: BatchExitTransaction,
+) -> list[AccountBalanceInDb]:
+    client = MongoService().client
+
+    transaction_col = TransactionsCollection()
+    account_balance_col = AccountBalancesCollection()
+
+    async with await client.start_session() as session:
+        async with session.start_transaction():
+            updated_balances: list[AccountBalanceInDb] = []
+
+            create_exit_transacions: list[CreateExitTransaction] = []
+
+            for exit_item in batch_exit_transaction.items:
+                result = (
+                    await account_balance_col.subtract_account_balance_with_session(
+                        exit_item.accountId,
+                        batch_exit_transaction.branchId,
+                        exit_item.quantity,
+                        updated_at=TimeTools.get_now_in_milliseconds(),
+                        session=session,
+                    )
+                )
+
+                if result is None:
+                    raise InsufficientBalanceError()
+
+                updated_balance = AccountBalanceInDb.model_validate(result)
+
+                updated_balances.append(updated_balance)
+
+                new_exit_transaction = CreateExitTransaction(
+                    accountId=exit_item.accountId,
+                    branchId=batch_exit_transaction.branchId,
+                    quantity=exit_item.quantity,
+                )
+
+                create_exit_transacions.append(new_exit_transaction)
+
+            exit_data = [exit.model_dump() for exit in create_exit_transacions]
+
+            await transaction_col.create_many_transactions_with_session(
+                exit_data,
+                session,
+            )
+
+            return updated_balances
