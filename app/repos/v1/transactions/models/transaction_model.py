@@ -45,8 +45,8 @@ class BatchExitItem(BaseModel):
 
 class BatchExitTransaction(BaseModel):
     branchId: str
-    type: Literal["ENTRY"] = "ENTRY"
-    items: list[BatchEntryItem]
+    type: Literal["EXIT"] = "EXIT"
+    items: list[BatchExitItem]
 
 
 CreateTransaction = Annotated[

@@ -70,7 +70,7 @@ class BatchLedgerManager:
             detail="Error processing account entry transaction",
         )
 
-    async def create_exit(self, create_exit_transaction: BatchExitTransaction):
+    async def create_batch_exit(self, create_exit_transaction: BatchExitTransaction):
         branch = await self.branches_repo.get_branch_by_id(
             create_exit_transaction.branchId
         )
