@@ -3,6 +3,7 @@ from repos.v1.transactions import (
     CreateExitTransaction,
     BatchEntryTransaction,
     BatchExitTransaction,
+    TransactionInDb,
 )
 
 from repos.v1.account_balances import AccountBalanceInDb
@@ -11,7 +12,7 @@ from services.mongo_collections.v1 import TransactionsCollection
 from services.mongo_collections.v1 import AccountBalancesCollection
 from services import MongoService
 
-from tools import TimeTools
+from tools import TimeTools, UuidTool
 
 
 async def process_account_entry_transaction(
@@ -32,7 +33,16 @@ async def process_account_entry_transaction(
                 session=session,
             )
 
-            transaction_data = entry.model_dump()
+            entry_data = entry.model_dump()
+
+            new_transaction = TransactionInDb(
+                id=UuidTool.generate_uuid(),
+                createdAt=TimeTools.get_now_in_milliseconds(),
+                **entry_data,
+            )
+
+            transaction_data = new_transaction.model_dump()
+
             await transaction_col.create_transaction_with_session(
                 transaction_data,
                 session,
@@ -66,7 +76,16 @@ async def process_account_exit_transaction(
             if result is None:
                 raise InsufficientBalanceError()
 
-            transaction_data = exit.model_dump()
+            exit_data = exit.model_dump()
+
+            new_transaction = TransactionInDb(
+                id=UuidTool.generate_uuid(),
+                createdAt=TimeTools.get_now_in_milliseconds(),
+                **exit_data,
+            )
+
+            transaction_data = new_transaction.model_dump()
+
             await transaction_col.create_transaction_with_session(
                 transaction_data,
                 session,
@@ -87,7 +106,7 @@ async def process_batch_account_entry_transaction(
         async with session.start_transaction():
             updated_balances: list[AccountBalanceInDb] = []
 
-            create_entry_transacions: list[CreateEntryTransaction] = []
+            create_entry_transacions: list[TransactionInDb] = []
 
             for entry_item in batch_entry_transaction.items:
                 result = await account_balance_col.update_account_balance_with_session(
@@ -108,7 +127,15 @@ async def process_batch_account_entry_transaction(
                     quantity=entry_item.quantity,
                 )
 
-                create_entry_transacions.append(new_entry_transaction)
+                entry_data = new_entry_transaction.model_dump()
+
+                new_transaction = TransactionInDb(
+                    id=UuidTool.generate_uuid(),
+                    createdAt=TimeTools.get_now_in_milliseconds(),
+                    **entry_data,
+                )
+
+                create_entry_transacions.append(new_transaction)
 
             entry_data = [entry.model_dump() for entry in create_entry_transacions]
 
@@ -132,7 +159,7 @@ async def process_batch_account_exit_transaction(
         async with session.start_transaction():
             updated_balances: list[AccountBalanceInDb] = []
 
-            create_exit_transacions: list[CreateExitTransaction] = []
+            create_exit_transacions: list[TransactionInDb] = []
 
             for exit_item in batch_exit_transaction.items:
                 result = (
@@ -158,7 +185,15 @@ async def process_batch_account_exit_transaction(
                     quantity=exit_item.quantity,
                 )
 
-                create_exit_transacions.append(new_exit_transaction)
+                exit_data = new_exit_transaction.model_dump()
+
+                transaction = TransactionInDb(
+                    id=UuidTool.generate_uuid(),
+                    createdAt=TimeTools.get_now_in_milliseconds(),
+                    **exit_data,
+                )
+
+                create_exit_transacions.append(transaction)
 
             exit_data = [exit.model_dump() for exit in create_exit_transacions]
 

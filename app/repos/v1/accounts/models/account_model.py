@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 class BaseAccount(BaseModel):
     name: str
-    unitId: str
     isActive: bool = True
 
 
