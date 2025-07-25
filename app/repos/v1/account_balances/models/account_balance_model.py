@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -16,4 +17,4 @@ class UpdateAccountBalance(BaseModel):
 
 
 class AccountBalanceInDb(BaseAccountBalance):
-    updatedAt: int | None = None
+    updatedAt: datetime | None = None

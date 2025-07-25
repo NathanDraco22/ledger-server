@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -19,5 +20,5 @@ class UpdateUnit(BaseModel):
 
 class UnitInDb(BaseUnit):
     id: str
-    createdAt: int
-    updatedAt: int | None = None
+    createdAt: datetime
+    updatedAt: datetime | None = None

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -18,5 +19,5 @@ class UpdateBranch(BaseModel):
 
 class BranchInDb(BaseBranch):
     id: str
-    createdAt: int
-    updatedAt: int | None = None
+    createdAt: datetime
+    updatedAt: datetime | None = None
