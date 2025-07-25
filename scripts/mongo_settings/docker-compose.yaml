@@ -1,8 +1,4 @@
-# docker-compose.yml (Versión Simplificada para Debugging)
-version: '3.8'
-
 services:
-  # Servicio de la base de datos MongoDB
   mongo-rs:
     image: mongo:latest
     container_name: mongo-replica-set
@@ -10,7 +6,6 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-    # Inicia MongoDB como un replica set llamado "rs0"
     command: ["--replSet", "rs0", "--bind_ip_all"]
 
 volumes:
