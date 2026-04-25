@@ -6,11 +6,12 @@ from services import MongoService
 
 class AccountsCollection:
     collection_name = "Accounts"
+    _instance: "AccountsCollection|None" = None
 
     def __new__(cls):
-        if not hasattr(cls, "instance"):
-            cls.instance = super(cls, cls).__new__(cls)
-        return cls.instance
+        if cls._instance is None:
+            cls._instance = super(cls, cls).__new__(cls)
+        return cls._instance
 
     def __init__(self):
         mongo_service = MongoService()
@@ -52,13 +53,4 @@ class AccountsCollection:
     async def delete_account_by_id(self, account_id: str) -> dict[str, Any] | None:
         collection = self.__collection
         result = await collection.find_one_and_delete({"id": account_id})
-        return result
-
-    async def count_accounts(self, account_ids: list[str]) -> int:
-        collection = self.__collection
-        result = await collection.count_documents(
-            {
-                "id": {"$in": account_ids},
-            },
-        )
         return result

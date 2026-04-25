@@ -1,10 +1,8 @@
-from datetime import datetime
 from pydantic import BaseModel
 
 
 class BaseAccount(BaseModel):
-    name: str
-    isActive: bool = True
+    pass
 
 
 class CreateAccount(BaseAccount):
@@ -12,11 +10,10 @@ class CreateAccount(BaseAccount):
 
 
 class UpdateAccount(BaseModel):
-    name: str | None = None
-    isActive: bool | None = None
+    pass
 
 
 class AccountInDb(BaseAccount):
     id: str
-    createdAt: datetime
-    updatedAt: datetime | None = None
+    createdAt: int
+    updatedAt: int | None = None

@@ -2,8 +2,6 @@ from fastapi import APIRouter
 
 from repos.v1.accounts import CreateAccount, UpdateAccount, AccountInDb
 
-from responses.v1 import ListResponse
-
 from .accounts_controller import accounts_controller
 
 
@@ -16,7 +14,7 @@ async def create_account(body: CreateAccount) -> AccountInDb:
 
 
 @accounts_router.get("")
-async def get_all_accounts() -> ListResponse[AccountInDb]:
+async def get_all_accounts() -> list[AccountInDb]:
     return await accounts_controller.get_all_accounts()
 
 
@@ -26,7 +24,7 @@ async def get_account_by_id(account_id: str) -> AccountInDb:
 
 
 @accounts_router.patch("/{account_id}")
-async def update_account_by_id(account_id: str, body: UpdateAccount) -> AccountInDb:
+async def update_account_by_id(account_id: str, body: UpdateAccount) -> AccountInDb: 
     return await accounts_controller.update_account_by_id(account_id, body)
 
 

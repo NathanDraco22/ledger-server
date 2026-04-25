@@ -1,14 +1,11 @@
 from fastapi import HTTPException, status
 
 from repos.v1.accounts import (
-    CreateAccount,
-    UpdateAccount,
-    AccountInDb,
+    CreateAccount, 
+    UpdateAccount, 
+    AccountInDb, 
     AccountsRepository,
-    AccountsDataSource,
 )
-
-from responses.v1 import ListResponse
 
 
 class AccountsController:
@@ -18,12 +15,9 @@ class AccountsController:
     async def create_account(self, body: CreateAccount) -> AccountInDb:
         return await self.accounts_repo.create_account(body)
 
-    async def get_all_accounts(self) -> ListResponse[AccountInDb]:
+    async def get_all_accounts(self) -> list[AccountInDb]:
         accounts = await self.accounts_repo.get_all_accounts()
-        return ListResponse(
-            count=len(accounts),
-            data=accounts,
-        )
+        return accounts
 
     async def get_account_by_id(self, account_id: str) -> AccountInDb:
         account = await self.accounts_repo.get_account_by_id(account_id)
@@ -34,12 +28,8 @@ class AccountsController:
             )
         return account
 
-    async def update_account_by_id(
-        self, account_id: str, body: UpdateAccount
-    ) -> AccountInDb:
-        updated_account = await self.accounts_repo.update_account_by_id(
-            account_id, body
-        )
+    async def update_account_by_id(self, account_id: str, body: UpdateAccount) -> AccountInDb:
+        updated_account = await self.accounts_repo.update_account_by_id(account_id, body)
         if updated_account is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -56,9 +46,6 @@ class AccountsController:
             )
         return deleted_account
 
-
 accounts_controller = AccountsController(
-    accounts_repo=AccountsRepository(
-        accounts_ds=AccountsDataSource(),
-    ),
+    accounts_repo=AccountsRepository.get_instance(),
 )
