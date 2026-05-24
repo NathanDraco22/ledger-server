@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from repos.v1.account_transactions import CreateAccountTransaction, UpdateAccountTransaction, AccountTransactionInDb
+from responses.v1.list_response import ListResponse
 
 from .account_transactions_controller import account_transactions_controller
 
@@ -14,7 +15,7 @@ async def create_account_transaction(body: CreateAccountTransaction) -> AccountT
 
 
 @account_transactions_router.get("")
-async def get_all_account_transactions() -> list[AccountTransactionInDb]:
+async def get_all_account_transactions() -> ListResponse[AccountTransactionInDb]:
     return await account_transactions_controller.get_all_account_transactions()
 
 

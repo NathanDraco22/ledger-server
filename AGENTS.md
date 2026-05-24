@@ -22,21 +22,66 @@ The project follows a strict **Onion Architecture** (Clean Architecture) pattern
 ---
 
 ## 🛠 Tooling: Onion CLI
-This project uses a custom CLI called `onion` to automate boilerplate creation. 
-Runs `onion --help` for available commands.
+This project uses a custom CLI called `onion` to automate boilerplate creation.
+Full documentation:
+- [ONION CLI Usage Guide](https://github.com/NathanDraco22/onion-cli/blob/main/ONION-CLI-USAGE.md)
+- [README](https://github.com/NathanDraco22/onion-cli/blob/main/README.md)
 
-### Common Commands
-- `onion crud <entity> --version 1`: Creates Router, Controller, Repo, DataSource, and Model.
-- `onion crud-mongo <entity> --version 1`: Same as above + MongoDB collection setup in `onion-config.toml`.
-- `onion repo <entity> --version 1`: Creates only the repository and data layers.
+Run `uv run onion --help` for available commands.
 
-### Manual Steps After Generation
-1. **Registration**: Every new router MUST be manually imported and included in `app/api/v1/router.py`:
-   ```python
-   from .my_entity.my_entity_router import my_entity_router
-   router_v1.include_router(my_entity_router, prefix="/my-entity")
-   ```
-2. **Main Router**: If creating a NEW API version (e.g., `v2`), it must be included in `app/main.py`.
+### Naming Rules
+- Entity names **must** be in **singular** (e.g., `product`, not `products`).
+- The CLI automatically pluralizes and converts to PascalCase (`order-item` → `OrderItem`).
+- Multiple entities can be passed at once: `onion crud product category supplier --version 1`.
+
+### FastAPI Commands
+
+| Command | Router + Controller | Repo + DataSource + Model | Mongo Collection |
+|---|---|---|---|
+| `router` | ✅ | ❌ | ❌ |
+| `crud` | ✅ | ✅ | ❌ |
+| `crud-mongo` | ✅ | ✅ | ✅ |
+| `repo` | ❌ | ✅ | ❌ |
+| `repo-mongo` | ❌ | ✅ | ✅ |
+
+- `--version` flag is **required** for all CRUD commands.
+- `--output-dir <DIR>` option controls where files are created (replaces `app/`).
+
+#### `onion project fastapi-app [OUTPUT_DIR] --force`
+Copies the `app/` folder template with placeholder entity names.
+
+#### `onion project fastapi-init OUTPUT_DIR --force`
+Copies a **complete** FastAPI project (root files, Dockerfile, tests, configs, etc.).
+
+### Generated File Counts (FastAPI)
+
+| Command | Files Created |
+|---|---|
+| `project fastapi-app` | ~15 |
+| `project fastapi-init` | ~25 |
+| `crud` | 6 |
+| `crud-mongo` | 10 |
+| `repo` | 4 |
+| `repo-mongo` | 8 |
+| `router` | 2 |
+
+### Auto-Registration
+The version router (`app/api/v1/router.py`) is **auto-created/updated** with `include_router()` lines — no manual setup needed.
+
+### Regeneration Behavior
+When re-running `crud-mongo` on an **existing** entity: the CLI regenerates entity files (router, controller, repository, datasource, models, collection) but **preserves** existing project-level infrastructure (`mongo_service.py`, `services/__init__.py`, `base_mongo_collection.py`). Collection classes are kept with the old pattern (not upgraded to `BaseMongoCollection`).
+
+**Important:** The CLI generates model properties as `snake_case` + `str` by default. After regeneration, you MUST fix them to match project conventions:
+- `created_at: str` → `createdAt: int`
+- `updated_at: str` → `updatedAt: int | None = None`
+
+### Known Circular Import Fix
+When `base_mongo_collection.py` is generated, it imports `from services import MongoService` which causes a circular import (since `services/__init__.py` imports `BaseMongoCollection` from it). Fix by changing to relative import:
+```python
+from .mongo_service import MongoService
+```
+
+**Note:** If creating a NEW API version (e.g., `v2`), it must be included in `app/main.py`.
 
 ---
 
@@ -62,6 +107,61 @@ Runs `onion --help` for available commands.
 ## 🤖 Agent Session Protocol
 - **`GEMINI.md`**: After every session or major feature completion, YOU MUST update the `GEMINI.md` file at the root. Record the date, the objective, and a summary of the technical implementation.
 - **Aesthetics**: When asked for Web App or UI changes, prioritize premium aesthetics, dynamic designs, and rich UX.
+
+---
+
+## ✅ Verification Commands
+After every modification, run these commands to verify code quality:
+1. `uv run ty check` — type checking
+2. `uv run ruff check --fix .` — linting and auto-format
+
+---
+
+## 📐 Repository Implementation Pattern
+When implementing repository methods (after CLI generation leaves `NotImplementedError` stubs), follow this established pattern from `app/repos/v1/branches/branches_repository.py`:
+
+### Available Tools
+- `from tools import TimeTools, UuidTool`
+  - `UuidTool.generate_uuid()` → generates a UUID v4 string
+  - `TimeTools.get_now_in_milliseconds()` → current Unix timestamp in milliseconds (int)
+
+### Create Method
+```python
+async def create_entity(self, create_data: CreateEntity) -> EntityInDb:
+    new_entity_in_db = EntityInDb(
+        **create_data.model_dump(),
+        id=UuidTool.generate_uuid(),
+        createdAt=TimeTools.get_now_in_milliseconds(),
+    )
+    await self.ds.create_entity(new_entity_in_db.model_dump())
+    return new_entity_in_db
+```
+
+### Update Method
+```python
+async def update_entity_by_id(self, entity_id: str, data: UpdateEntity) -> EntityInDb | None:
+    data_dict = data.model_dump(exclude_unset=True)
+    data_dict["updatedAt"] = TimeTools.get_now_in_milliseconds()
+    result = await self.ds.update_entity_by_id(entity_id, data_dict)
+    if result is None:
+        return None
+    return EntityInDb.model_validate(result)
+```
+
+### Get By Id / Delete By Id Pattern
+Both follow the same pattern:
+```python
+result = await self.ds.method(entity_id)
+if result is None:
+    return None
+return EntityInDb.model_validate(result)
+```
+
+### Get All Pattern
+```python
+results = await self.ds.get_all()
+return [EntityInDb.model_validate(r) for r in results]
+```
 
 ---
 

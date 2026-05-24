@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status
 
+from responses.v1.list_response import ListResponse
 from repos.v1.accounts import (
     CreateAccount, 
     UpdateAccount, 
@@ -15,9 +16,9 @@ class AccountsController:
     async def create_account(self, body: CreateAccount) -> AccountInDb:
         return await self.accounts_repo.create_account(body)
 
-    async def get_all_accounts(self) -> list[AccountInDb]:
+    async def get_all_accounts(self) -> ListResponse[AccountInDb]:
         accounts = await self.accounts_repo.get_all_accounts()
-        return accounts
+        return ListResponse(data=accounts, count=len(accounts))
 
     async def get_account_by_id(self, account_id: str) -> AccountInDb:
         account = await self.accounts_repo.get_account_by_id(account_id)

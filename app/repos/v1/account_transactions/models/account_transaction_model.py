@@ -15,5 +15,5 @@ class UpdateAccountTransaction(BaseModel):
 
 class AccountTransactionInDb(BaseAccountTransaction):
     id: str
-    created_at: str
-    updated_at: str
+    createdAt: int
+    updatedAt: int | None = None

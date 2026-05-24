@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from repos.v1.accounts import CreateAccount, UpdateAccount, AccountInDb
+from responses.v1.list_response import ListResponse
 
 from .accounts_controller import accounts_controller
 
@@ -14,7 +15,7 @@ async def create_account(body: CreateAccount) -> AccountInDb:
 
 
 @accounts_router.get("")
-async def get_all_accounts() -> list[AccountInDb]:
+async def get_all_accounts() -> ListResponse[AccountInDb]:
     return await accounts_controller.get_all_accounts()
 
 
