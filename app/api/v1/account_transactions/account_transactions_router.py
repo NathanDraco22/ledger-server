@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from repos.v1.account_transactions import CreateAccountTransaction, UpdateAccountTransaction, AccountTransactionInDb
+from ledger.repos.v1.account_transactions import CreateAccountTransaction, UpdateAccountTransaction, AccountTransactionInDb
 from responses.v1.list_response import ListResponse
 
 from .account_transactions_controller import account_transactions_controller

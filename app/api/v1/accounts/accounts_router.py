@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from repos.v1.accounts import CreateAccount, UpdateAccount, AccountInDb
+from ledger.repos.v1.accounts import CreateAccount, UpdateAccount, AccountInDb
 from responses.v1.list_response import ListResponse
 
 from .accounts_controller import accounts_controller

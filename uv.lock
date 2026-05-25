@@ -337,11 +337,27 @@ wheels = [
 ]
 
 [[package]]
+name = "ledger"
+version = "0.1.0"
+source = { editable = "packages/ledger" }
+dependencies = [
+    { name = "motor" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "motor", specifier = ">=3.7.1" },
+    { name = "pydantic", specifier = ">=2.0" },
+]
+
+[[package]]
 name = "ledger-server"
 version = "0.1.1"
 source = { virtual = "." }
 dependencies = [
     { name = "fastapi", extra = ["standard"] },
+    { name = "ledger" },
     { name = "motor" },
     { name = "python-dotenv" },
 ]
@@ -358,6 +374,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.136.1" },
+    { name = "ledger", editable = "packages/ledger" },
     { name = "motor", specifier = ">=3.7.1" },
     { name = "python-dotenv", specifier = ">=1.2.2" },
 ]

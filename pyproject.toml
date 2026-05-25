@@ -8,6 +8,7 @@ dependencies = [
     "fastapi[standard]>=0.136.1",
     "motor>=3.7.1",
     "python-dotenv>=1.2.2",
+    "ledger",
 ]
 
 [dependency-groups]
@@ -21,9 +22,11 @@ dev = [
 
 [tool.uv.sources]
 onion = { git = "https://github.com/NathanDraco22/onion-cli.git" }
+ledger = { path = "packages/ledger", editable = true }
 
 [tool.ty.environment]
 extra-paths = [
     "./app",
+    "./packages/ledger",
     ".venv/Lib/site-packages"
 ]

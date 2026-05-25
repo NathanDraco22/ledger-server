@@ -1,0 +1,9 @@
+[project]
+name = "ledger"
+version = "0.1.0"
+description = "Ledger Server core package"
+requires-python = ">=3.12"
+dependencies = [
+    "motor>=3.7.1",
+    "pydantic>=2.0",
+]

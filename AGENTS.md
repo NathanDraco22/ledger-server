@@ -8,16 +8,17 @@ The project follows a strict **Onion Architecture** (Clean Architecture) pattern
 `Router` (HTTP) → `Controller` (Orchestration) → `Repository` (Business Logic) → `DataSource` (DB/Persistence) → `Service` (External)
 
 ### Layer Responsibilities
-- **`app/api/vX/`**: 
-    - `router.py`: Endpoint definitions using FastAPI.
-    - `controller.py`: Validates inputs, calls repositories, and maps responses.
-- **`app/repos/vX/`**:
-    - `repository.py`: Orchestrates business logic and domain rules.
-    - `data/`: `datasource.py` implements specific DB queries (MongoDB/Motor).
-    - `models/`: Domain Pydantic models.
-- **`app/core/`**: Shared complex business processes (e.g., invoice processing, report generation).
-- **`app/services/`**: Outermost layer for external world (Database connections, file storage, etc.).
-- **`app/tools/`**: Pure utilities and auxiliary helpers.
+- **`packages/ledger/`**: Editable Python package (`ledger`) that encapsulates all business logic. Designed to be reusable across future implementations.
+  - `ledger/repos/vX/`: Repositories, datasources, and Pydantic models (business logic layer).
+  - `ledger/core/`: Shared complex business processes (e.g., invoice processing, report generation).
+  - `ledger/services/`: Database connections, external service abstractions (MongoDB/Motor).
+  - `ledger/tools/`: Pure utilities and auxiliary helpers (`TimeTools`, `UuidTool`).
+  - `ledger/config/`: Configuration files (e.g., `onion-config.toml`).
+- **`app/api/vX/`**: FastAPI presentation layer.
+  - `router.py`: Endpoint definitions.
+  - `controller.py`: Validates inputs, calls package repositories, and maps responses.
+- **`app/responses/`**: Shared response models (e.g., `ListResponse`).
+- **`app/main.py`**, **`app/app_lifespan.py`**: Application entry point and lifecycle.
 
 ---
 

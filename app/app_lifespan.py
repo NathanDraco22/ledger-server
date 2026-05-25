@@ -2,10 +2,10 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from core.services_initializer import init_services
+from ledger.core.services_initializer import ledger_init_services
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_services()
+    await ledger_init_services()
     yield

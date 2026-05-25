@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from repos.v1.branches import CreateBranch, UpdateBranch, BranchInDb
+from ledger.repos.v1.branches import CreateBranch, UpdateBranch, BranchInDb
 from responses.v1.list_response import ListResponse
 
 from .branches_controller import branches_controller
