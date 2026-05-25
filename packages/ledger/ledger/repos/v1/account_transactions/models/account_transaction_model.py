@@ -2,7 +2,10 @@ from pydantic import BaseModel
 
 
 class BaseAccountTransaction(BaseModel):
-    pass
+    accountId: str
+    journalId: str
+    amount: int
+    resultBalance: int
 
 
 class CreateAccountTransaction(BaseAccountTransaction):

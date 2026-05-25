@@ -3,7 +3,6 @@ from fastapi import HTTPException, status
 from responses.v1.list_response import ListResponse
 from ledger.repos.v1.account_transactions import (
     CreateAccountTransaction, 
-    UpdateAccountTransaction, 
     AccountTransactionInDb, 
     AccountTransactionsRepository,
 )
@@ -29,23 +28,6 @@ class AccountTransactionsController:
             )
         return account_transaction
 
-    async def update_account_transaction_by_id(self, account_transaction_id: str, body: UpdateAccountTransaction) -> AccountTransactionInDb:
-        updated_account_transaction = await self.account_transactions_repo.update_account_transaction_by_id(account_transaction_id, body)
-        if updated_account_transaction is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="AccountTransaction not found",
-            )
-        return updated_account_transaction
-
-    async def delete_account_transaction_by_id(self, account_transaction_id: str) -> AccountTransactionInDb:
-        deleted_account_transaction = await self.account_transactions_repo.delete_account_transaction_by_id(account_transaction_id)
-        if deleted_account_transaction is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="AccountTransaction not found",
-            )
-        return deleted_account_transaction
 
 account_transactions_controller = AccountTransactionsController(
     account_transactions_repo=AccountTransactionsRepository.get_instance(),
