@@ -1,17 +1,12 @@
 from fastapi import APIRouter
 
-from ledger.repos.v1.account_transactions import CreateAccountTransaction, AccountTransactionInDb
+from ledger.repos.v1.account_transactions import AccountTransactionInDb
 from responses.v1.list_response import ListResponse
 
 from .account_transactions_controller import account_transactions_controller
 
 
 account_transactions_router = APIRouter(tags=["account_transactionsV1"])
-
-
-@account_transactions_router.post("")
-async def create_account_transaction(body: CreateAccountTransaction) -> AccountTransactionInDb:
-    return await account_transactions_controller.create_account_transaction(body)
 
 
 @account_transactions_router.get("")

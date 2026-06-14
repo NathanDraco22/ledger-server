@@ -1,5 +1,6 @@
 import os
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from api.v1.router import router_v1
 from app_lifespan import lifespan
@@ -15,6 +16,14 @@ app = FastAPI(
     title="Ledger Server",
     openapi_url=open_api_url,
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
 )
 
 app.include_router(router_v1, prefix="/api/v1")

@@ -2,10 +2,10 @@ from pydantic import BaseModel
 
 
 class JournalLine(BaseModel):
+    branchId: str | None = None
     accountId: str
     amount: int
     description: str
-    branchId: str | None = None
     pass
 
 

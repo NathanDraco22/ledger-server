@@ -40,6 +40,10 @@ class AccountTransactionsCollection(BaseMongoCollection):
 
         return result
 
+    async def create_many_transactions(self, transactions: list[dict]) -> None:
+        collection = self._collection
+        await collection.insert_many(transactions)
+
     async def delete_account_transaction_by_id(self, account_transaction_id: str) -> dict[str, Any] | None:
         collection = self._collection
         result = await collection.find_one_and_delete({"id": account_transaction_id})

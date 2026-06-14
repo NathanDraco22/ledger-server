@@ -3,7 +3,7 @@ from typing import Literal, Any
 from pymongo import AsyncMongoClient
 from pymongo.asynchronous.collection import AsyncCollection
 
-DatabaseName = Literal["LedgerDB"]
+DatabaseName = Literal["AccountDB"]
 
 
 class MongoService:
@@ -24,7 +24,7 @@ class MongoService:
     def get_collection(
         self,
         collection_name: str,
-        database_name: DatabaseName = "LedgerDB",
+        database_name: DatabaseName = "AccountDB",
     ) -> AsyncCollection[dict[str, Any]]:
         db = self.client.get_database(database_name)
         return db.get_collection(collection_name)

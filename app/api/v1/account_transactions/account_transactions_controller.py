@@ -2,8 +2,7 @@ from fastapi import HTTPException, status
 
 from responses.v1.list_response import ListResponse
 from ledger.repos.v1.account_transactions import (
-    CreateAccountTransaction, 
-    AccountTransactionInDb, 
+    AccountTransactionInDb,
     AccountTransactionsRepository,
 )
 
@@ -11,9 +10,6 @@ from ledger.repos.v1.account_transactions import (
 class AccountTransactionsController:
     def __init__(self, account_transactions_repo: AccountTransactionsRepository) -> None:
         self.account_transactions_repo = account_transactions_repo
-
-    async def create_account_transaction(self, body: CreateAccountTransaction) -> AccountTransactionInDb:
-        return await self.account_transactions_repo.create_account_transaction(body)
 
     async def get_all_account_transactions(self) -> ListResponse[AccountTransactionInDb]:
         account_transactions = await self.account_transactions_repo.get_all_account_transactions()
