@@ -10,14 +10,6 @@ from ledger.services.mongo_collections.v1 import (
 )
 from ledger.tools import TimeTools, UuidTool
 
-SIGN_FACTOR: dict[str, int] = {
-    "asset": 1,
-    "expense": 1,
-    "liability": -1,
-    "equity": -1,
-    "revenue": -1,
-}
-
 
 async def process_journal(create_journal: CreateJournalEntry) -> JournalEntryInDb:
     mongo_client = MongoService().client
@@ -42,11 +34,7 @@ async def process_journal(create_journal: CreateJournalEntry) -> JournalEntryInD
                         )
                     accounts_map[line.accountId] = account
 
-                total = sum(
-                    abs(line.amount)
-                    * SIGN_FACTOR[accounts_map[line.accountId]["baseType"]]
-                    for line in create_journal.lines
-                )
+                total = sum(line.amount for line in create_journal.lines)
                 if total != 0:
                     raise ValueError("Journal entry does not balance")
 
@@ -62,10 +50,7 @@ async def process_journal(create_journal: CreateJournalEntry) -> JournalEntryInD
                 for line in create_journal.lines:
                     account = accounts_map[line.accountId]
 
-                    amount_to_add = (
-                        abs(line.amount)
-                        * SIGN_FACTOR[account["baseType"]]
-                    )
+                    amount_to_add = line.amount
                     new_balance = account["currentBalance"] + amount_to_add
 
                     await account_col.update_account_by_id(
@@ -79,6 +64,7 @@ async def process_journal(create_journal: CreateJournalEntry) -> JournalEntryInD
                     transactions.append(
                         AccountTransactionInDb(
                             accountId=line.accountId,
+                            docNumber=journal_entry.docNumber,
                             journalId=journal_entry.id,
                             amount=amount_to_add,
                             resultBalance=new_balance,

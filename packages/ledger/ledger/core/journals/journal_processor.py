@@ -1,4 +1,4 @@
-from ledger.repos.v1.journal_entries import CreateJournalEntry
+from ledger.repos.v1.journal_entries import CreateJournalEntry, JournalEntryInDb
 from .process_journal import process_journal
 
 
@@ -11,5 +11,7 @@ class JournalProcessor:
             cls._instance = cls()
         return cls._instance
 
-    async def create_journal(self, create_journal: CreateJournalEntry):
-        await process_journal(create_journal)
+    async def create_journal(
+        self, create_journal: CreateJournalEntry
+    ) -> JournalEntryInDb:
+        return await process_journal(create_journal)

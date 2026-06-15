@@ -2,7 +2,6 @@ from typing import Literal
 from pydantic import BaseModel
 
 AccountType = Literal["credit", "debit"]
-BaseAccountType = Literal["asset", "liability", "equity", "revenue", "expense"]
 
 
 class BaseAccount(BaseModel):
@@ -14,7 +13,6 @@ class BaseAccount(BaseModel):
     isDetail: bool = False
     currentBalance: int = 0
     type: AccountType
-    baseType: BaseAccountType
     code: str = ""
 
 
@@ -27,7 +25,6 @@ class UpdateAccount(BaseModel):
     description: str | None = None
     path: list[str] | None = None
     type: AccountType | None = None
-    baseType: BaseAccountType | None = None
     code: str | None = None
 
 

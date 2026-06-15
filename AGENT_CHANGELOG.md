@@ -55,6 +55,26 @@
     base (Activos, Pasivos, Patrimonio, Ingresos, Egresos) usando el repositorio.
   - No está conectada a ningún flujo aún. Pendiente de decidir dónde dispararla.
 
+## [2026-06-14] Eliminado baseType del modelo Account
+
+- **`packages/ledger/ledger/repos/v1/accounts/models/account_model.py`**
+  - Eliminado `BaseAccountType` type alias y campo `baseType` de `BaseAccount` y `UpdateAccount`.
+  - Las cuentas ahora solo usan `type` (debit/credit) para su naturaleza.
+
+- **`packages/ledger/ledger/core/default_values/default_accounts.py`**
+  - `DEFAULT_ACCOUNTS` convertido de `list[dict]` a función `default_accounts_list()` que retorna `list[CreateAccount]` directamente.
+  - Eliminado `baseType` de todos los valores por defecto.
+
+## [2026-06-14] Fix: balance check ignoraba el signo débito/crédito
+
+- **`packages/ledger/ledger/core/journals/process_journal.py`**
+  - Eliminado `SIGN_FACTOR` y `abs(line.amount)` del cálculo de balance.
+  - Ahora se usa `line.amount` directamente (positivo = débito, negativo = crédito).
+  - **Bug**: El `abs()` impedía distinguir créditos de débitos, causando
+    `ValueError("Journal entry does not balance")` en asientos balanceados
+    que usaban créditos en cuentas de naturaleza deudora (ej. pagar gasto
+    en efectivo: crédito a Caja + débito a Gasto).
+
 ### Pendiente por definir
 
 - **Dónde disparar `default_accounts(business_id)`**: al crear un negocio, en

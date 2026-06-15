@@ -4,6 +4,7 @@ from pydantic import BaseModel
 class BaseAccountTransaction(BaseModel):
     accountId: str
     journalId: str
+    docNumber: str
     amount: int
     resultBalance: int
 
